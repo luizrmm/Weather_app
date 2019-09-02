@@ -20,7 +20,7 @@ class HomePage extends StatelessWidget {
                     Padding(
                       padding: EdgeInsets.fromLTRB(10, 100, 10, 10),
                       child: Text(
-                        weatherInfo.city_name,
+                        weatherInfo.city_name.toUpperCase(),
                         style: TextStyle(
                             fontFamily: "Montserrat",
                             fontSize: 40,
@@ -36,7 +36,7 @@ class HomePage extends StatelessWidget {
                             child: Align(
                               alignment: Alignment.center,
                               child: Text(
-                                weatherInfo.date,
+                                Provider.of<WeatherNotifier>(context).dayWeek,
                                 style: TextStyle(
                                     fontFamily: "Montserrat",
                                     fontSize: 18.0,
@@ -56,7 +56,7 @@ class HomePage extends StatelessWidget {
                             child: Align(
                               alignment: Alignment.center,
                               child: Text(
-                                weatherInfo.time,
+                                weatherInfo.time + ' last update',
                                 style: TextStyle(
                                     fontFamily: "Montserrat",
                                     fontSize: 18.0,
@@ -109,7 +109,7 @@ class HomePage extends StatelessWidget {
           Provider.of<WeatherNotifier>(context).getData();
         },
         child: Icon(
-          Icons.refresh,
+          Icons.cloud_queue,
           color: Colors.white,
         ),
       ),

@@ -3,8 +3,6 @@ import 'package:weather_app/models/weather.dart';
 import 'package:weather_app/services/weather_service.dart';
 
 class WeatherNotifier with ChangeNotifier {
-  ApiWeather api = ApiWeather();
-
   final String clearNight = "images/clear-night.png";
   final String clearDay = "images/clear-day.png";
   final String cloudy = "images/cloudy.png";
@@ -16,13 +14,17 @@ class WeatherNotifier with ChangeNotifier {
   final String snow = "images/snow.png";
   final String wind = "images/wind.png";
 
-  Weather _clima;
-
   String _dayWeek;
+
+  String _imgPath;
+
+  Weather _data;
 
   String get dayWeek => _dayWeek;
 
-  Weather get clima => _clima;
+  String get imgPath => _imgPath;
+
+  Weather get data => _data;
 
   WeatherNotifier() {
     weekDay();
@@ -48,28 +50,54 @@ class WeatherNotifier with ChangeNotifier {
     notifyListeners();
   }
 
-  Future getData() async {
-    _clima = await api.loadData();
-    if (_clima.condition_slug == "rain" || _clima.condition_slug == "storm") {
-      _clima.imgPath = rain;
-    } else if (_clima.condition_slug == "snow") {
-      _clima.imgPath = snow;
-    } else if (_clima.condition_slug == "fog") {
-      _clima.imgPath = wind;
-    } else if (_clima.condition_slug == "clear_day") {
-      _clima.imgPath = clearDay;
-    } else if (_clima.condition_slug == "clear_night") {
-      _clima.imgPath = clearNight;
-    } else if (_clima.condition_slug == "cloudly_day") {
-      _clima.imgPath = partCloudDay;
-    } else if (_clima.condition_slug == "cloudly_night") {
-      _clima.imgPath = partCloudNight;
-    } else if (_clima.condition_slug == "hail") {
-      _clima.imgPath = sleet;
+  void setImagePath(String weatherCondition) {
+    if (weatherCondition == "rain" || weatherCondition == "storm") {
+      _imgPath = rain;
+    } else if (weatherCondition == "snow") {
+      _imgPath = snow;
+    } else if (weatherCondition == "fog") {
+      _imgPath = wind;
+    } else if (weatherCondition == "clear_day") {
+      _imgPath = clearDay;
+    } else if (weatherCondition == "clear_night") {
+      _imgPath = clearNight;
+    } else if (weatherCondition == "cloudly_day") {
+      _imgPath = partCloudDay;
+    } else if (weatherCondition == "cloudly_night") {
+      _imgPath = partCloudNight;
+    } else if (weatherCondition == "hail") {
+      _imgPath = sleet;
     } else {
-      _clima.imgPath = cloudy;
+      _imgPath = cloudy;
     }
     notifyListeners();
-    return _clima;
+  }
+
+  String setImagePathForecast(String weatherCondition) {
+    if (weatherCondition == "rain" || weatherCondition == "storm") {
+      return rain;
+    } else if (weatherCondition == "snow") {
+      return snow;
+    } else if (weatherCondition == "fog") {
+      return wind;
+    } else if (weatherCondition == "clear_day") {
+      return clearDay;
+    } else if (weatherCondition == "clear_night") {
+      return clearNight;
+    } else if (weatherCondition == "cloudly_day") {
+      return partCloudDay;
+    } else if (weatherCondition == "cloudly_night") {
+      return partCloudNight;
+    } else if (weatherCondition == "hail") {
+      return sleet;
+    } else {
+      return cloudy;
+    }
+  }
+
+  Future loadProvider() async {
+    _data = await ApiWeather().loadData();
+    setImagePath(_data.conditionSlug);
+    return _data;
   }
 }

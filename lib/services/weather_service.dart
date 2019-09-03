@@ -4,7 +4,8 @@ import 'package:weather_app/models/weather.dart';
 import 'package:http/http.dart' as http;
 
 class ApiWeather {
-  final String baseUrl = "https://api.hgbrasil.com/weather?user_ip=remote";
+  final String baseUrl =
+      "https://api.hgbrasil.com/weather?key=03455d97&user_ip=remote";
 
   Future<Weather> loadData() async {
     Map<String, dynamic> data;

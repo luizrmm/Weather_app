@@ -56,7 +56,7 @@ class WeatherNotifier with ChangeNotifier {
     } else if (weatherCondition == "snow") {
       _imgPath = snow;
     } else if (weatherCondition == "fog") {
-      _imgPath = wind;
+      _imgPath = fog;
     } else if (weatherCondition == "clear_day") {
       _imgPath = clearDay;
     } else if (weatherCondition == "clear_night") {

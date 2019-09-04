@@ -14,29 +14,78 @@ class Forecast extends StatelessWidget {
       body: ListView.builder(
         itemCount: forecast.length,
         itemBuilder: (context, index) {
-          return Row(
-            children: <Widget>[
-              Padding(
-                padding: EdgeInsets.symmetric(vertical: 6.0, horizontal: 15.0),
-                child: Image.asset(
-                  Provider.of<WeatherNotifier>(context)
-                      .setImagePathForecast(forecast[index]["condition"]),
-                  height: 120,
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  flex: 1,
+                  child: Container(
+                    child: Image.asset(Provider.of<WeatherNotifier>(context)
+                        .setImagePathForecast(forecast[index]["condition"])),
+                  ),
                 ),
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(forecast[index]["weekday"] +
-                      " " +
-                      forecast[index]["date"]),
-                  Text(
-                    forecast[index]["description"],
-                    style: TextStyle(fontSize: 14.0),
-                  )
-                ],
-              )
-            ],
+                Expanded(
+                  flex: 2,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(15.0, 0, 15.0, 12.0),
+                        child: RichText(
+                          text: TextSpan(
+                            text: '${forecast[index]["weekday"]}   ',
+                            style: TextStyle(
+                                color: Colors.grey[800],
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18.0,
+                                fontFamily: 'Montserrat'),
+                            children: <TextSpan>[
+                              TextSpan(
+                                  text: forecast[index]["date"],
+                                  style: TextStyle(
+                                      color: Colors.grey[700],
+                                      fontWeight: FontWeight.normal,
+                                      fontSize: 14.0)),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 15.0),
+                        child: Text(
+                          forecast[index]["description"],
+                          style: TextStyle(fontFamily: 'Montserrat'),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+                Expanded(
+                  flex: 1,
+                  child: Column(
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.only(top: 0),
+                        child: Text(
+                          'Max ${forecast[index]["max"]}°C',
+                          style: TextStyle(
+                              color: Colors.red, fontFamily: 'Montserrat'),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 12.0),
+                        child: Text(
+                          'Min ${forecast[index]["min"]}°C',
+                          style: TextStyle(
+                              color: Colors.blue, fontFamily: 'Montserrat'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           );
         },
       ),

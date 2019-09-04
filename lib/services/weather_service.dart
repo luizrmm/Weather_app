@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 
 class ApiWeather {
   final String baseUrl =
-      "https://api.hgbrasil.com/weather?key=03455d97&user_ip=remote";
+      "https://api.hgbrasil.com/weather?key=ecf51367&city_name=Caconde";
 
   Future<Weather> loadData() async {
     Map<String, dynamic> data;

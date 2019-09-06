@@ -95,8 +95,8 @@ class WeatherNotifier with ChangeNotifier {
     }
   }
 
-  Future loadProvider() async {
-    _data = await ApiWeather().loadData();
+  Future loadProvider(String cidade) async {
+    _data = await ApiWeather().loadData(cidade);
     setImagePath(_data.conditionSlug);
     return _data;
   }

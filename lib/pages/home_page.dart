@@ -2,14 +2,46 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:weather_app/notifiers/weather_notifier.dart';
 import 'package:weather_app/pages/forecast_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  Future requestData;
+  String cidade;
+
+  _setCidade(String cidade) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('city', cidade);
+  }
+
+  _getCidade() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String eoq = prefs.getString('city');
+    cidade = eoq;
+  }
+
+  @override
+  void initState() {
+    _getCidade();
+    Future.delayed(Duration(seconds: 2), () {
+      setState(() {
+        requestData = Provider.of<WeatherNotifier>(context, listen: false)
+            .loadProvider(cidade);
+      });
+    });
+
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: FutureBuilder(
-        future:
-            Provider.of<WeatherNotifier>(context, listen: false).loadProvider(),
+        future: requestData,
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.none:
@@ -30,10 +62,27 @@ class HomePage extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
+                      Container(
+                        margin: EdgeInsets.fromLTRB(30.0, 60.0, 30.0, 0),
+                        child: TextField(
+                          decoration:
+                              InputDecoration(suffixIcon: Icon(Icons.search)),
+                          onSubmitted: (text) {
+                            setState(() {
+                              requestData = Provider.of<WeatherNotifier>(
+                                      context,
+                                      listen: false)
+                                  .loadProvider(text);
+                            });
+                            _setCidade(text);
+                          },
+                        ),
+                      ),
                       Padding(
-                        padding: EdgeInsets.fromLTRB(10, 100, 10, 10),
+                        padding: EdgeInsets.fromLTRB(10, 40, 10, 10),
                         child: Text(
                           snapshot.data.cityName.toUpperCase(),
+                          textAlign: TextAlign.center,
                           style: TextStyle(
                               fontFamily: "Montserrat",
                               fontSize: 40,

@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:weather_app/notifiers/weather_notifier.dart';
 import 'package:weather_app/pages/forecast_page.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
+import '../notifiers/weather_notifier.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -10,78 +11,40 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  Future requestData;
-  String cidade;
-
-  _setCidade(String cidade) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('city', cidade);
-  }
-
-  _getCidade() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String eoq = prefs.getString('city');
-    cidade = eoq;
-  }
-
-  @override
-  void initState() {
-    _getCidade();
-    Future.delayed(Duration(seconds: 2), () {
-      setState(() {
-        requestData = Provider.of<WeatherNotifier>(context, listen: false)
-            .loadProvider(cidade);
-      });
-    });
-
-    super.initState();
-  }
-
+  TextEditingController _cidade = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: FutureBuilder(
-        future: requestData,
-        builder: (context, snapshot) {
-          switch (snapshot.connectionState) {
-            case ConnectionState.none:
-              return Container();
-              break;
-            case ConnectionState.waiting:
-              return Center(
-                child: CircularProgressIndicator(),
-              );
-              break;
-            case ConnectionState.active:
-              return Container();
-              break;
-            case ConnectionState.done:
-              return Container(
-                  width: double.infinity,
-                  color: Colors.white,
-                  child: Column(
+      body: Container(
+        width: double.infinity,
+        color: Colors.white,
+        child: Consumer<WeatherNotifier>(
+          builder: (context, weather, child) {
+            return weather.loading || weather.data == null
+                ? Center(
+                    child: CircularProgressIndicator(),
+                  )
+                : Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
                       Container(
                         margin: EdgeInsets.fromLTRB(30.0, 60.0, 30.0, 0),
                         child: TextField(
-                          decoration:
-                              InputDecoration(suffixIcon: Icon(Icons.search)),
-                          onSubmitted: (text) {
-                            setState(() {
-                              requestData = Provider.of<WeatherNotifier>(
-                                      context,
-                                      listen: false)
-                                  .loadProvider(text);
-                            });
-                            _setCidade(text);
-                          },
+                          controller: _cidade,
+                          decoration: InputDecoration(
+                              suffixIcon: IconButton(
+                            onPressed: () {
+                              weather.loadProvider(_cidade.text);
+                              weather.setCidade(_cidade.text);
+                            },
+                            icon: Icon(Icons.search),
+                          )),
                         ),
                       ),
                       Padding(
                         padding: EdgeInsets.fromLTRB(10, 40, 10, 10),
                         child: Text(
-                          snapshot.data.cityName.toUpperCase(),
+                          weather.data.cityName.toUpperCase(),
                           textAlign: TextAlign.center,
                           style: TextStyle(
                               fontFamily: "Montserrat",
@@ -113,18 +76,19 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ),
                           Flexible(
-                              flex: 2,
-                              fit: FlexFit.tight,
-                              child: Align(
-                                alignment: Alignment.center,
-                                child: Text(
-                                  snapshot.data.time + ' last update',
-                                  style: TextStyle(
-                                      fontFamily: "Montserrat",
-                                      fontSize: 18.0,
-                                      fontWeight: FontWeight.w600),
-                                ),
-                              )),
+                            flex: 2,
+                            fit: FlexFit.tight,
+                            child: Align(
+                              alignment: Alignment.center,
+                              child: Text(
+                                weather.data.time + ' last update',
+                                style: TextStyle(
+                                    fontFamily: "Montserrat",
+                                    fontSize: 18.0,
+                                    fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                       Padding(
@@ -132,7 +96,7 @@ class _HomePageState extends State<HomePage> {
                         child: SizedBox(
                           height: MediaQuery.of(context).size.width * 0.55,
                           child: Image.asset(
-                            Provider.of<WeatherNotifier>(context).imgPath,
+                            weather.imgPath,
                             fit: BoxFit.cover,
                           ),
                         ),
@@ -140,7 +104,7 @@ class _HomePageState extends State<HomePage> {
                       Padding(
                         padding: const EdgeInsets.only(bottom: 20.0),
                         child: Text(
-                          "${snapshot.data.temp.toString()}°C",
+                          "${weather.data.temp.toString()}°C",
                           style: TextStyle(
                             fontFamily: "Montserrat",
                             fontSize: 76.0,
@@ -148,17 +112,14 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                       Text(
-                        snapshot.data.description,
+                        weather.data.description,
                         style:
                             TextStyle(fontFamily: "Montserrat", fontSize: 20.0),
                       )
                     ],
-                  ));
-              break;
-            default:
-              return Container();
-          }
-        },
+                  );
+          },
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -166,7 +127,7 @@ class _HomePageState extends State<HomePage> {
               context, MaterialPageRoute(builder: (context) => Forecast()));
         },
         child: Icon(
-          Icons.cloud_queue,
+          Icons.cloud,
           color: Colors.white,
         ),
       ),

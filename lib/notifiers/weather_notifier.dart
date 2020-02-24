@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:weather_app/models/weather.dart';
 import 'package:weather_app/services/weather_service.dart';
 
+import '../models/weather.dart';
+import '../services/weather_service.dart';
+
 class WeatherNotifier with ChangeNotifier {
+  final ApiWeather _apiWeather;
   final String clearNight = "images/clear-night.png";
   final String clearDay = "images/clear-day.png";
   final String cloudy = "images/cloudy.png";
@@ -20,13 +25,22 @@ class WeatherNotifier with ChangeNotifier {
 
   Weather _data;
 
+  String _errorMessage;
+  String get errorMessage => _errorMessage;
+
+  String _cidade;
+
+  bool _loading = false;
+  bool get loading => _loading;
+
   String get dayWeek => _dayWeek;
 
   String get imgPath => _imgPath;
 
   Weather get data => _data;
 
-  WeatherNotifier() {
+  WeatherNotifier(this._apiWeather) {
+    getCidade();
     weekDay();
   }
 
@@ -95,9 +109,32 @@ class WeatherNotifier with ChangeNotifier {
     }
   }
 
+  void setCidade(String cidade) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('city', cidade);
+  }
+
+  void getCidade() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    _cidade = prefs.getString('city');
+    loadProvider(_cidade);
+  }
+
   Future loadProvider(String cidade) async {
-    _data = await ApiWeather().loadData(cidade);
-    setImagePath(_data.conditionSlug);
-    return _data;
+    setBusy(true);
+    try {
+      _data = await _apiWeather.loadData(cidade);
+      setImagePath(_data.conditionSlug);
+      setBusy(false);
+      return _data;
+    } catch (e) {
+      _errorMessage = e.response.data["message"];
+      setBusy(false);
+    }
+  }
+
+  setBusy(bool value) {
+    _loading = value;
+    notifyListeners();
   }
 }

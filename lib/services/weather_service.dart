@@ -1,16 +1,17 @@
-import 'dart:convert';
-
+import 'package:dio/dio.dart';
 import 'package:weather_app/models/weather.dart';
-import 'package:http/http.dart' as http;
 
 class ApiWeather {
   final String baseUrl =
-      "https://api.hgbrasil.com/weather?key=c5c80adb&city_name=";
+      "https://api.hgbrasil.com/weather?key=918cc734&city_name=";
 
   Future<Weather> loadData(String cidade) async {
-    Map<String, dynamic> data;
-    http.Response response = await http.get('$baseUrl$cidade');
-    data = json.decode(response.body)["results"];
-    return Weather.fromJson(data);
+    try {
+      Response response = await Dio().get('$baseUrl$cidade');
+      return Weather.fromJson(response.data['results']);
+    } on DioError catch (e) {
+      print(e.response.data);
+      throw e;
+    }
   }
 }

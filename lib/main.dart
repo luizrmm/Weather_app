@@ -3,13 +3,21 @@ import 'package:provider/provider.dart';
 import 'package:weather_app/notifiers/weather_notifier.dart';
 import 'package:weather_app/pages/home_page.dart';
 
+import 'services/weather_service.dart';
+
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      providers: [ChangeNotifierProvider(builder: (_) => WeatherNotifier())],
+      providers: [
+        ChangeNotifierProvider(
+          create: (context) => WeatherNotifier(
+            ApiWeather(),
+          ),
+        )
+      ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         theme:

@@ -1,10 +1,12 @@
-# weather_app
+# Weather
 
-A new Flutter project.
+This is an minimalist example of a weather app made in Flutter
 
-## Getting Started
+### Resources used
 
-This project is a starting point for a Flutter application.
+- provider architeture;
+- dio: http package;
+- shared_preferences;
 
 A few resources to get you started if this is your first Flutter project:
 
